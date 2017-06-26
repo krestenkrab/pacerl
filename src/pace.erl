@@ -25,7 +25,7 @@
 %% crypto functions
 
 kdf_pi(PIN,Salt) ->
-    Key = pbkdf2:pbkdf2(?HASH, PIN, Salt, 1024),
+    {ok,Key} = pbkdf2:pbkdf2(?HASH, PIN, Salt, 1024),
 %    true = (?BITS =< bit_size(Key)),
     Bytes = keybits(?ENC) div 8,
     <<OutKey:Bytes/binary, _/binary>> = Key,
@@ -46,7 +46,7 @@ keybits(aes_cbc256) ->
     256.
 
 enc(Key, I) when I>0 ->
-    IV = crypto:rand_bytes(16),
+    IV = crypto:strong_rand_bytes(16),
     PlainText = uint2bin32(I), % must be multiple of 32 bytes
     Encoded = crypto:block_encrypt(?ENC, Key, IV, PlainText),
     << IV/binary, Encoded/binary>>.
